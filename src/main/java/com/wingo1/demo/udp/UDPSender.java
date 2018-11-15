@@ -7,7 +7,6 @@ import java.net.MulticastSocket;
 public class UDPSender {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(DetectResult.DepAborted.name() + DetectResult.GoAround.getInfo());
 		MulticastSocket socket = new MulticastSocket();
 		// socket.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getByName("192.168.44.139")));
 		byte[] bytes = new String("hello UDP").getBytes();
