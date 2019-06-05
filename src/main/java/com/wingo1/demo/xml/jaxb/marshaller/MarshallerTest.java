@@ -10,6 +10,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Node;
+
 /**
  * 利用JAXB,对象转XML,XML转对象
  * 
@@ -52,7 +56,9 @@ public class MarshallerTest {
 		String xmlObj = new String(baos.toByteArray()); // 生成XML字符串
 		System.out.println(xmlObj);
 
-		// Document doc = DocumentHelper.parseText(xmlObj);
+		Document doc = DocumentHelper.parseText(xmlObj);
+		Node node = doc.selectSingleNode(".//list");
+
 		conventback(xmlObj);
 	}
 
