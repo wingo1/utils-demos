@@ -1,4 +1,4 @@
-package com.wingo1.thread;
+package com.wingo1.example.thread;
 
 /**
  * 可见性例子，使用64位JDK试验
