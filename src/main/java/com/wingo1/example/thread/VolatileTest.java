@@ -24,10 +24,11 @@ public class VolatileTest {
 			try {
 				isShutdown = new Boolean(false);
 				System.out.println("开始循环");
-				while (!isShutdown) {
-
+				while (true) {
+					if (isShutdown) {
+						break;
+					}
 				}
-				;
 				System.out.println("结束循环");
 			} catch (Exception e) {
 				e.printStackTrace();
