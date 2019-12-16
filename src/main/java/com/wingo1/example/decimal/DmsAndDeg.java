@@ -20,7 +20,7 @@ public class DmsAndDeg {
 	public static double dmsTodeg(String dms) {
 		int indexOf = dms.indexOf(".");
 		if (indexOf == -1) {
-			indexOf = dms.length() + 1;
+			indexOf = dms.length();
 		}
 		double sec = Double.valueOf(dms.substring(indexOf - 2));
 		int min = Integer.valueOf(dms.substring(indexOf - 4, indexOf - 2));
