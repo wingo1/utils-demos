@@ -1,6 +1,7 @@
 package com.wingo1.example.date;
 
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +28,10 @@ public class LocalDateTimeTest {
 		// 得到long
 		System.out.println(calendar.getTimeInMillis());
 		System.out.println(localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		// long转datetime
+		System.out.println(
+				LocalDateTime.ofInstant(Instant.ofEpochMilli(calendar.getTimeInMillis()), ZoneId.systemDefault()));
+
 	}
 
 }
