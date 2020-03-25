@@ -1,6 +1,7 @@
 package com.wingo1.example.date;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,8 +19,10 @@ public class LocalDateTimeTest {
 		DateTimeFormatter ofPattern = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
 		LocalDateTime d = LocalDateTime.parse("2019-11-12-10:14", ofPattern);
 		// 当前时间
-		LocalDate date = LocalDate.now();
-		// 转换
+		LocalDateTime date = LocalDateTime.now();
+		// 计算时间差
+		System.out.println(Duration.between(d, date).toDays());
+		/********************** 转换 *********************************/
 		LocalDate localDate = localDateTime.toLocalDate();
 		LocalTime localTime = localDateTime.toLocalTime();
 		DayOfWeek dayOfWeek = DayOfWeek.valueOf("Wednesday".toUpperCase());
