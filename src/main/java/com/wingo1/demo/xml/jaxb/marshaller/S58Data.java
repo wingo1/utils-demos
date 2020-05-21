@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author sunshixiong
  * @date 2018/1/4 8:57
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.FIELD) // 默认是get set
 @XmlType(propOrder = {})
 @XmlRootElement(name = "data")
 public class S58Data implements Serializable {
