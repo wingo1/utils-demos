@@ -13,8 +13,9 @@ public class DmsAndDeg {
 		int deg = (int) f;
 		int min = (int) ((f - deg) * 60);
 		float sec = (float) (((f - deg) * 60 - min) * 60);
-		DecimalFormat df = new DecimalFormat("00.000");
-		return deg + "" + min + df.format(sec);
+		DecimalFormat minDf = new DecimalFormat("00");
+		DecimalFormat secDf = new DecimalFormat("00.000");
+		return deg + "" + minDf.format(min) + secDf.format(sec);
 	}
 
 	public static double dmsTodeg(String dms) {
