@@ -1,7 +1,6 @@
-package com.wingo1.example.shapefile;
+package com.wingo1.example.shapefile.map;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -14,26 +13,16 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
-import org.geotools.sld.v1_1.SLDConfiguration;
-import org.geotools.styling.NamedLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
 import org.geotools.swing.dialog.JExceptionReporter;
 import org.geotools.swing.styling.JSimpleStyleDialog;
-import org.geotools.xsd.Configuration;
-import org.geotools.xsd.Parser;
+import org.geotools.xml.styling.SLDParser;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.FilterFactory;
 
-/**
- * 注意，使用的是V1.1的sld
- * 
- * @author cdatc-wingo1
- *
- */
 public class ShapeFIleShow {
 	static StyleFactory styleFactory = CommonFactoryFinder.getStyleFactory();
 	static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory();
@@ -108,16 +97,10 @@ public class ShapeFIleShow {
 	/** Create a Style object from a definition in a SLD document */
 	private static Style createFromSLD(File sld) {
 		try {
-			/*
-			 * SLDParser stylereader = new SLDParser(styleFactory, sld.toURI().toURL());
-			 * Style[] style = stylereader.readXML(); return style[0];
-			 */
-			// v1.1 sld
-			Configuration config = new SLDConfiguration();
-			Parser parser = new Parser(config);
-			StyledLayerDescriptor sldDesc = (StyledLayerDescriptor) parser.parse(new FileInputStream(sld));
-			NamedLayer styledLayer = (NamedLayer) sldDesc.getStyledLayers()[0];
-			return styledLayer.getStyles()[0];
+			SLDParser stylereader = new SLDParser(styleFactory, sld.toURI().toURL());
+			Style[] style = stylereader.readXML();
+			return style[0];
+
 		} catch (Exception e) {
 			JExceptionReporter.showDialog(e, "Problem creating style");
 		}

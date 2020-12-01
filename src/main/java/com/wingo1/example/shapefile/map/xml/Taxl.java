@@ -1,4 +1,4 @@
-package com.wingo1.example.shapefile.xml;
+package com.wingo1.example.shapefile.map.xml;
 
 import java.util.List;
 

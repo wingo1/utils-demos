@@ -1,4 +1,4 @@
-package com.wingo1.example.shapefile.xml;
+package com.wingo1.example.shapefile.map.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,7 +16,7 @@ public class ExtinfoTaxiLine {
 	@XmlAttribute
 	String priority = "0";
 
-	String type;
+	String type = "normal";
 
 	String taxiname;
 

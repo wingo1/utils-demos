@@ -1,4 +1,4 @@
-package com.wingo1.example.shapefile;
+package com.wingo1.example.shapefile.map;
 
 import java.io.File;
 import java.io.Serializable;
@@ -37,11 +37,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.wingo1.example.decimal.DmsAndDeg;
-import com.wingo1.example.shapefile.xml.ExtinfoTaxiLine;
-import com.wingo1.example.shapefile.xml.SysMapPoint;
-import com.wingo1.example.shapefile.xml.SysMapPolyline;
-import com.wingo1.example.shapefile.xml.Taxl;
+import com.wingo1.example.shapefile.map.utils.DmsAndDeg;
+import com.wingo1.example.shapefile.map.xml.ExtinfoTaxiLine;
+import com.wingo1.example.shapefile.map.xml.SysMapPoint;
+import com.wingo1.example.shapefile.map.xml.SysMapPolyline;
+import com.wingo1.example.shapefile.map.xml.Taxl;
 
 /**
  * graphics gmp to shp
@@ -50,10 +50,12 @@ import com.wingo1.example.shapefile.xml.Taxl;
  *
  */
 public class TaxlGmpToShp {
-	final private static String CRS_STRING = "32648";
+	private String CRS_STRING = "32648";
 
-	public static void main(String[] args) throws Exception {
-
+	public void excute(String crsCode) throws Exception {
+		if (crsCode != null && "".equals(crsCode)) {
+			CRS_STRING = crsCode;
+		}
 		File file = JFileDataStoreChooser.showOpenFile("gmp", new File("d:/"), null);
 		if (file == null) {
 			return;
@@ -100,6 +102,10 @@ public class TaxlGmpToShp {
 		System.out.println("处理完毕，准备保存shp...");
 		// 保存shp
 		File newFile = getNewShapeFile(file);
+		if (newFile == null) {
+			System.out.println("保存shp文件出错！");
+			return;
+		}
 
 		ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
 
@@ -151,10 +157,10 @@ public class TaxlGmpToShp {
 				transaction.close();
 			}
 			System.out.println("保存完毕！");
-			System.exit(0); // success!
+			return; // success!
 		} else {
 			System.out.println(typeName + " does not support read/write access");
-			System.exit(1);
+			return;
 		}
 	}
 
@@ -169,14 +175,12 @@ public class TaxlGmpToShp {
 		int returnVal = chooser.showSaveDialog(null);
 
 		if (returnVal != JFileDataStoreChooser.APPROVE_OPTION) {
-			// the user cancelled the dialog
-			System.exit(0);
+			return null;
 		}
 
 		File newFile = chooser.getSelectedFile();
 		if (newFile.equals(csvFile)) {
-			System.out.println("Error: cannot replace " + csvFile);
-			System.exit(0);
+			return null;
 		}
 
 		return newFile;
