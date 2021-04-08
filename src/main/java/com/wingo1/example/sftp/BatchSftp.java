@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 
@@ -321,21 +322,23 @@ public class BatchSftp {
 			return;
 		}
 		DefaultListModel<String> remoteListModel = (DefaultListModel) remoteJlist.getModel();
-		remoteListModel.clear();
 		String ip = ipList.get(0);
 		getChannel(ip);
 		channelSftp.cd(remoteDirectory);
 		Vector ls = channelSftp.ls(".");
-		for (Object object : ls) {
-			LsEntry entry = (LsEntry) object;
-			if (entry.getAttrs().isDir()) {
-				remoteListModel.addElement(entry.getFilename() + "/");
-				continue;
+		SwingUtilities.invokeLater(() -> {
+			remoteListModel.clear();
+			for (Object object : ls) {
+				LsEntry entry = (LsEntry) object;
+				if (entry.getAttrs().isDir()) {
+					remoteListModel.addElement(entry.getFilename() + "/");
+					continue;
+				}
+				remoteListModel.addElement(entry.getFilename());
 			}
-			remoteListModel.addElement(entry.getFilename());
-		}
-		System.out.println("远端目录刷新完成！");
-		logout();
+			System.out.println("远端目录刷新完成！");
+			logout();
+		});
 	}
 
 	// 192.168.225.[1-4,6-8]
