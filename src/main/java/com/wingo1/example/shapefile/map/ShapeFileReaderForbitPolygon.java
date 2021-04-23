@@ -26,10 +26,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import com.cdatc.shapefile.utils.DmsAndDeg;
-import com.cdatc.shapefile.xml.Content;
-import com.cdatc.shapefile.xml.SysMapPoint;
-import com.cdatc.shapefile.xml.SysMapPolygon;
+import com.wingo1.example.shapefile.map.utils.DmsAndDeg;
+import com.wingo1.example.shapefile.map.xml.Content;
+import com.wingo1.example.shapefile.map.xml.SysMapPoint;
+import com.wingo1.example.shapefile.map.xml.SysMapPolygon;
 
 public class ShapeFileReaderForbitPolygon {
 

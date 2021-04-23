@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Content {
 	@XmlElement(name = "text")
 	public List<SysMapText> texts;
+	@XmlElement(name = "polygon")
+	public List<SysMapPolygon> polygons;
 
 	public List<SysMapText> getTexts() {
 		return texts;
@@ -19,5 +21,13 @@ public class Content {
 
 	public void setTexts(List<SysMapText> texts) {
 		this.texts = texts;
+	}
+
+	public List<SysMapPolygon> getPolygons() {
+		return polygons;
+	}
+
+	public void setPolygons(List<SysMapPolygon> polygons) {
+		this.polygons = polygons;
 	}
 }
