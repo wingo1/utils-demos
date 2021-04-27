@@ -173,6 +173,8 @@ public class BatchSftpController implements Initializable {
 						channelSftp.put(inputStream, select);
 						System.out.println(ip + "上传完成！");
 					}
+					// 修改权限
+					channelSftp.chmod(Integer.parseInt("777", 8), select);
 				}
 			} catch (Exception e) {
 				System.err.println(ip + "批量上传出错:" + e);
