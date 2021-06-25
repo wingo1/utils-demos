@@ -3,11 +3,16 @@
     -fx-text-fill: black; 
     -fx-border-color:#4CAF50;
     -fx-border-width:2px;
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
 }
 
 .button1:hover {
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
+}
+.button1:pressed {
+    -fx-background-color: #9CBF69;
 }
 .toggle-button:selected {
     -fx-background-color: #4CAF50;
