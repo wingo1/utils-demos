@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.commons.io.FileUtils;
 
@@ -84,7 +85,7 @@ public class BatchSftp {
 		jLabel.setBounds(5, 5, 40, 20);
 		frame.getContentPane().add(jLabel);
 		JTextField ipText = new JTextField();
-		ipText.setBounds(50, 5, 420, 20);
+		ipText.setBounds(50, 3, 420, 30);
 		ipText.setText("输入IP段，格式：192.168.225.[1-4,6-8]");
 		frame.getContentPane().add(ipText);
 		// 2个列表
@@ -100,7 +101,7 @@ public class BatchSftp {
 		frame.getContentPane().add(remoteJScrollPane);
 		// 按钮些
 		JButton openLocalDir = new JButton("选择本地目录");
-		openLocalDir.setBounds(5, 30, 120, 30);
+		openLocalDir.setBounds(5, 35, 120, 30);
 		frame.getContentPane().add(openLocalDir);
 		openLocalDir.addMouseListener(new MouseAdapter() {
 
@@ -119,7 +120,7 @@ public class BatchSftp {
 		});
 
 		JTextField remoteDir = new JTextField("输入远程目录，按回车生效");
-		remoteDir.setBounds(250, 30, 220, 30);
+		remoteDir.setBounds(250, 35, 220, 30);
 		remoteDir.addKeyListener(new KeyAdapter() {
 
 			@Override
@@ -222,7 +223,13 @@ public class BatchSftp {
 			}
 
 		}).start();// 输出线程
-
+		// 简单设置lookandfeel
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			SwingUtilities.updateComponentTreeUI(frame);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	/**

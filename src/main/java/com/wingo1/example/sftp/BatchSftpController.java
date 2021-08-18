@@ -125,8 +125,12 @@ public class BatchSftpController implements Initializable {
 
 	@FXML
 	private void batchUploadClick() {
-		Alert alert = new Alert(AlertType.CONFIRMATION, "确定上传文件到以下主机" + toMultiline(ipList), ButtonType.YES,
-				ButtonType.NO);
+		parseIpText(ipTextField.getText());
+		Alert alert = new Alert(AlertType.CONFIRMATION, "确定上传文件到以下主机:", ButtonType.YES, ButtonType.NO);
+		TextArea textArea = new TextArea(ipList.toString());
+		textArea.setWrapText(true);
+		alert.getDialogPane().setExpandableContent(textArea);
+		alert.getDialogPane().setExpanded(true);
 		Optional<ButtonType> showAndWait = alert.showAndWait();
 		if (showAndWait.get() == ButtonType.YES) {
 			if (localList.getSelectionModel().getSelectedItems().size() == 0) {
@@ -137,7 +141,6 @@ public class BatchSftpController implements Initializable {
 				return;
 			}
 			threadPool.execute(() -> {
-				parseIpText(ipTextField.getText());
 				batchUpload();
 			});
 		}
@@ -192,8 +195,11 @@ public class BatchSftpController implements Initializable {
 	@FXML
 	private void batchDeleteClick() {
 		parseIpText(ipTextField.getText());
-		Alert alert = new Alert(AlertType.CONFIRMATION, "确定删除以下主机的文件:" + toMultiline(ipList), ButtonType.YES,
-				ButtonType.NO);
+		Alert alert = new Alert(AlertType.CONFIRMATION, "确定删除以下主机的文件:", ButtonType.YES, ButtonType.NO);
+		TextArea textArea = new TextArea(ipList.toString());
+		textArea.setWrapText(true);
+		alert.getDialogPane().setExpandableContent(textArea);
+		alert.getDialogPane().setExpanded(true);
 		if (alert.showAndWait().get() == ButtonType.YES) {
 			threadPool.execute(() -> {
 				batchDelete();
@@ -331,16 +337,4 @@ public class BatchSftpController implements Initializable {
 		}
 	}
 
-	private String toMultiline(List<String> ips) {
-		StringBuilder sBuilder = new StringBuilder();
-		int i = 1;
-		for (String string : ips) {
-			sBuilder.append(string).append(",");
-			if (i % 10 == 0) {
-				sBuilder.append("\n");
-			}
-			i++;
-		}
-		return sBuilder.toString();
-	}
 }
