@@ -3,6 +3,7 @@ package com.wingo1.example.aspectj;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 
 @Aspect
@@ -11,6 +12,13 @@ public class AccountAspect {
 	// @Pointcut("call(public boolean Account.withdraw(int))&& args(amount) &&
 	// target(acc)")
 	public void callWithDraw(int amount, Account acc) {
+	}
+
+	@Before("call(public boolean Account.withdraw(int))&& args(amount)")
+	public void beforeCall(int amount) {
+		if (amount > 5) {
+			return;
+		}
 	}
 
 	@Around("callWithDraw(amount,acc)")
