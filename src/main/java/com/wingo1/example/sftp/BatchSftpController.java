@@ -84,7 +84,10 @@ public class BatchSftpController implements Initializable {
 			while (true) {
 				String msg = baoStream.toString();
 				baoStream.reset();
-				Platform.runLater(() -> output.appendText(msg));
+				Platform.runLater(() -> {
+					if (!output.isFocused())
+						output.appendText(msg);
+				});
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
