@@ -41,20 +41,29 @@ public class WGS84toUTMController implements Initializable {
 			new Alert(AlertType.ERROR, "ESPG为空！").showAndWait();
 			return;
 		}
-		// 计算系统中心点utm坐标
-		CoordinateReferenceSystem sourceCRS = DefaultGeographicCRS.WGS84;
-		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:" + epsgField.getText(), true);
-		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
-		String wgs84sString = wgsArea.getText();
-		String[] splitLine = wgs84sString.split("\n");
-		for (String string : splitLine) {
-			String[] split = string.split(",");
-			Coordinate result = transform(split[0].trim(), split[1].trim(), transform);
-			if (result != null) {
-				utmArea.appendText(result.x + "," + result.y + "\n");
-			} else {
-				utmArea.appendText("no result\n");
+		try {
+			// 计算系统中心点utm坐标
+			CoordinateReferenceSystem sourceCRS = DefaultGeographicCRS.WGS84;
+			CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:" + epsgField.getText(), true);
+			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
+			String wgs84sString = wgsArea.getText();
+			String[] splitLine = wgs84sString.split("\n");
+			for (String string : splitLine) {
+				String[] split = string.split(",");
+				Coordinate result = transform(split[0].trim(), split[1].trim(), transform);
+				if (result != null) {
+					utmArea.appendText(result.x + "," + result.y + "\n");
+				} else {
+					utmArea.appendText("no result\n");
+				}
 			}
+		} catch (Exception e) {
+			Alert alert = new Alert(AlertType.ERROR, "转换失败，检查数据！");
+			TextArea textArea = new TextArea(e.toString() + "\n" + e.getStackTrace()[0]);
+			textArea.setWrapText(true);
+			alert.getDialogPane().setExpandableContent(textArea);
+			alert.getDialogPane().setExpanded(true);
+			alert.showAndWait();
 		}
 
 	}
