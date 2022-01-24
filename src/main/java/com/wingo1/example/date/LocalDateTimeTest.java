@@ -22,6 +22,8 @@ public class LocalDateTimeTest {
 		LocalDateTime date = LocalDateTime.now();
 		// 计算时间差
 		System.out.println(Duration.between(d, date).toDays());
+		// 调整
+		d.withHour(6);
 		/********************** 转换 *********************************/
 		LocalDate localDate = localDateTime.toLocalDate();
 		LocalTime localTime = localDateTime.toLocalTime();
