@@ -28,10 +28,10 @@ public class RabbitMqClient {
 
 			ConnectionFactory factory = new ConnectionFactory();
 			// "guest"/"guest" by default, limited to localhost connections
-			factory.setUsername("guest");
-			factory.setPassword("guest");
+			factory.setUsername("test");
+			factory.setPassword("test");
 			factory.setVirtualHost("/");
-			factory.setHost("localhost");
+			factory.setHost("192.168.226.179");
 			factory.setPort(5672);
 			try (Connection conn = factory.newConnection();) {
 				Channel channel = conn.createChannel();
@@ -51,10 +51,10 @@ public class RabbitMqClient {
 		factory.setRequestedHeartbeat(10);
 		factory.setAutomaticRecoveryEnabled(true);// 默认就是true
 		// "guest"/"guest" by default, limited to localhost connections
-		factory.setUsername("guest");
-		factory.setPassword("guest");
+		factory.setUsername("test");
+		factory.setPassword("test");
 		factory.setVirtualHost("/");
-		factory.setHost("localhost");
+		factory.setHost("192.168.226.179");
 		factory.setPort(5672);
 		Connection conn = factory.newConnection();
 		Channel channel = conn.createChannel();

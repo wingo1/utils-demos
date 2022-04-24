@@ -4,7 +4,7 @@
 <configuration scan="true">
 	<!-- 这样就不用担心ImmediateFlush=false时，程序关闭日志不全的问题 -->
 	<shutdownHook class='ch.qos.logback.core.hook.DelayingShutdownHook'/>
-	<appender name="FILE"
+	<!-- <appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -21,7 +21,7 @@
 	<appender name="ASYNC_FILE"
 		class="ch.qos.logback.classic.AsyncAppender">
 		<appender-ref ref="FILE" />
-	</appender>
+	</appender> -->
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
