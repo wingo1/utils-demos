@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 
 import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -45,7 +47,6 @@ import javafx.stage.DirectoryChooser;
 public class BatchSftpController implements Initializable {
 
 	ByteArrayOutputStream baoStream = new ByteArrayOutputStream(1024);
-	private ChannelSftp channelSftp;
 	private Session session;
 	private List<String> ipList = new ArrayList<>();
 	private File localDirectory;
@@ -64,6 +65,9 @@ public class BatchSftpController implements Initializable {
 	private ListView<String> remoteList;
 	@FXML
 	private TextArea output;
+	@FXML
+	private TextField shellField;
+
 	private ObservableList<String> localObservableList;
 	private ObservableList<String> remoteObservableList;
 
@@ -162,8 +166,9 @@ public class BatchSftpController implements Initializable {
 	private void batchUpload() {
 		// 批量IP
 		for (String ip : ipList) {
+			ChannelSftp channelSftp = null;
 			try {
-				getChannel(ip);
+				channelSftp = getChannel(ip, ChannelSftp.class);
 				channelSftp.cd(remoteDirectory);
 				// 批量文件
 				List<String> selectedValuesList = localList.getSelectionModel().getSelectedItems();
@@ -185,7 +190,7 @@ public class BatchSftpController implements Initializable {
 			} catch (Exception e) {
 				System.err.println(ip + "批量上传出错:" + e);
 			} finally {
-				logout();
+				logout(channelSftp);
 			}
 		}
 		try {
@@ -198,7 +203,8 @@ public class BatchSftpController implements Initializable {
 	@FXML
 	private void batchDeleteClick() {
 		parseIpText(ipTextField.getText());
-		Alert alert = new Alert(AlertType.CONFIRMATION, "确定删除以下主机的文件:", ButtonType.YES, ButtonType.NO);
+		Alert alert = new Alert(AlertType.CONFIRMATION,
+				"确定删除以下主机的文件" + remoteList.getSelectionModel().getSelectedItems(), ButtonType.YES, ButtonType.NO);
 		TextArea textArea = new TextArea(ipList.toString());
 		textArea.setWrapText(true);
 		alert.getDialogPane().setExpandableContent(textArea);
@@ -216,8 +222,9 @@ public class BatchSftpController implements Initializable {
 	private void batchDelete() {
 		// 批量IP
 		for (String ip : ipList) {
+			ChannelSftp channelSftp = null;
 			try {
-				getChannel(ip);
+				channelSftp = getChannel(ip, ChannelSftp.class);
 				channelSftp.cd(remoteDirectory);
 				List<String> selectedValuesList = remoteList.getSelectionModel().getSelectedItems();
 				if (selectedValuesList.size() == 0) {
@@ -236,7 +243,7 @@ public class BatchSftpController implements Initializable {
 			} catch (Exception e) {
 				System.err.println(ip + "批量删除出错:" + e);
 			} finally {
-				logout();
+				logout(channelSftp);
 			}
 		}
 		try {
@@ -265,7 +272,7 @@ public class BatchSftpController implements Initializable {
 			return;
 		}
 		String ip = ipList.get(0);
-		getChannel(ip);
+		ChannelSftp channelSftp = getChannel(ip, ChannelSftp.class);
 		channelSftp.cd(remoteDirectory);
 		Vector ls = channelSftp.ls(".");
 		Platform.runLater(() -> {
@@ -279,7 +286,7 @@ public class BatchSftpController implements Initializable {
 				remoteObservableList.add(entry.getFilename());
 			}
 			System.out.println("远端目录刷新完成！");
-			logout();
+			logout(channelSftp);
 		});
 	}
 
@@ -312,7 +319,49 @@ public class BatchSftpController implements Initializable {
 
 	}
 
-	private void getChannel(String ip) throws JSchException {
+	@FXML
+	private void batchExecClick() {
+		parseIpText(ipTextField.getText());
+		Alert alert = new Alert(AlertType.CONFIRMATION, "确定在以下主机执行[" + shellField.getText() + "]", ButtonType.YES,
+				ButtonType.NO);
+		TextArea textArea = new TextArea(ipList.toString());
+		textArea.setWrapText(true);
+		alert.getDialogPane().setExpandableContent(textArea);
+		alert.getDialogPane().setExpanded(true);
+		if (alert.showAndWait().get() == ButtonType.YES) {
+			threadPool.execute(() -> {
+				batchExec();
+			});
+		}
+	}
+
+	private void batchExec() {
+		for (String ip : ipList) {
+			ChannelExec channelExec = null;
+			try {
+				channelExec = getChannel(ip, ChannelExec.class, false);
+				channelExec.setCommand(shellField.getText());
+				Scanner scanner = new Scanner(channelExec.getInputStream());
+				channelExec.connect(2000);
+				StringBuilder sbBuilder = new StringBuilder();
+				while (scanner.hasNextLine()) {
+					sbBuilder.append(scanner.nextLine());
+				}
+				System.out.println(ip + "执行完成!" + sbBuilder.toString());
+			} catch (Exception e) {
+				System.err.println(ip + "批量执行出错:" + e);
+			} finally {
+				logout(channelExec);
+			}
+		}
+
+	}
+
+	private <T extends Channel> T getChannel(String ip, Class<T> channelType) throws JSchException {
+		return getChannel(ip, channelType, true);
+	}
+
+	private <T extends Channel> T getChannel(String ip, Class<T> channelType, boolean connect) throws JSchException {
 		JSch jsch = new JSch();
 		session = jsch.getSession(USER, ip);
 		session.setPassword(PWD);
@@ -324,16 +373,23 @@ public class BatchSftpController implements Initializable {
 		session.connect();
 		// 通过Session建立链接
 		// 打开SFTP通道
-		Channel channel = session.openChannel("sftp");
-		// 建立SFTP通道的连接
-		channel.connect();
-		System.out.println(ip + "connect successfully!");
-		channelSftp = (ChannelSftp) channel;
+		T channel = null;
+		if (channelType.equals(ChannelSftp.class)) {
+			channel = (T) session.openChannel("sftp");
+		} else if (channelType.equals(ChannelExec.class)) {
+			channel = (T) session.openChannel("exec");
+		}
+		if (connect) {
+			// 建立SFTP通道的连接
+			channel.connect();
+			System.out.println(ip + "connect successfully!");
+		}
+		return channel;
 	}
 
-	private void logout() {
-		if (channelSftp != null) {
-			channelSftp.disconnect();
+	private void logout(Channel channel) {
+		if (channel != null) {
+			channel.disconnect();
 		}
 		if (session != null) {
 			session.disconnect();

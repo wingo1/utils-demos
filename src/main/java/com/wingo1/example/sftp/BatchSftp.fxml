@@ -4,28 +4,32 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="639.0" prefWidth="500.0" styleClass="background" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wingo1.example.sftp.BatchSftpController">
+<AnchorPane prefHeight="705.0" prefWidth="500.0" styleClass="background" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wingo1.example.sftp.BatchSftpController">
    <children>
       <Label layoutX="27.0" layoutY="22.0" text="IP段：" />
       <TextField fx:id="ipTextField" focusTraversable="false" layoutX="77.0" layoutY="17.0" prefHeight="30.0" prefWidth="396.0" promptText="输入IP段，格式：192.168.225.[1-4,6-8]" />
       <Button layoutX="33.0" layoutY="69.0" mnemonicParsing="false" onAction="#openLocal" prefHeight="30.0" prefWidth="177.0" text="选择本地目录" />
       <TextField fx:id="remoteDir" layoutX="271.0" layoutY="69.0" onKeyReleased="#openRemote" prefHeight="30.0" prefWidth="200.0" promptText="输入远程目录，按回车生效" />
-      <TextArea fx:id="output" layoutX="28.0" layoutY="517.0" prefHeight="100.0" prefWidth="444.0" />
+      <TextArea fx:id="output" layoutX="27.0" layoutY="585.0" prefHeight="100.0" prefWidth="444.0" />
       <ListView fx:id="localList" layoutX="28.0" layoutY="119.0" prefHeight="306.0" prefWidth="200.0" />
-      <Label layoutX="30.0" layoutY="490.0" text="执行情况：" />
+      <Label layoutX="27.0" layoutY="550.0" text="执行情况：" />
       <ListView fx:id="remoteList" layoutX="271.0" layoutY="119.0" prefHeight="306.0" prefWidth="200.0" />
-      <Button layoutX="33.0" layoutY="441.0" mnemonicParsing="false" onAction="#batchUploadClick" prefHeight="30.0" prefWidth="97.0" text="批量上传" />
+      <Button layoutX="29.0" layoutY="441.0" mnemonicParsing="false" onAction="#batchUploadClick" prefHeight="30.0" prefWidth="97.0" text="批量上传" />
       <HBox layoutX="271.0" layoutY="441.0" spacing="10.0">
          <children>
             <Button layoutX="271.0" layoutY="441.0" mnemonicParsing="false" onAction="#download" text="下载" />
             <Button layoutX="371.0" layoutY="441.0" mnemonicParsing="false" onAction="#batchDeleteClick" text="批量删除远端文件" />
          </children>
       </HBox>
+      <Separator layoutX="28.0" layoutY="478.0" prefHeight="13.0" prefWidth="444.0" />
+      <TextField fx:id="shellField" layoutX="27.0" layoutY="509.0" prefHeight="30.0" prefWidth="278.0" promptText="ls -l" />
+      <Button layoutX="348.0" layoutY="509.0" mnemonicParsing="false" onAction="#batchExecClick" text="批量执行SHELL" />
    </children>
    <stylesheets>
       <URL value="@sftp.css" />
