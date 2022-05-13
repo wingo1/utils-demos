@@ -2,6 +2,7 @@ package com.wingo1.example.decimal.crs;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geometry.jts.JTS;
@@ -42,19 +43,21 @@ public class WGS84toUTMController implements Initializable {
 			return;
 		}
 		try {
+			utmArea.clear();
 			// 计算系统中心点utm坐标
 			CoordinateReferenceSystem sourceCRS = DefaultGeographicCRS.WGS84;
 			CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:" + epsgField.getText(), true);
 			MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
 			String wgs84sString = wgsArea.getText();
-			String[] splitLine = wgs84sString.split("\n");
-			for (String string : splitLine) {
-				String[] split = string.split(",");
-				Coordinate result = transform(split[0].trim(), split[1].trim(), transform);
-				if (result != null) {
-					utmArea.appendText(result.x + "," + result.y + "\n");
-				} else {
-					utmArea.appendText("no result\n");
+			try (Scanner scanner = new Scanner(wgs84sString)) {
+				while (scanner.hasNextLine()) {
+					String[] split = scanner.nextLine().split(",");
+					Coordinate result = transform(split[0].trim(), split[1].trim(), transform);
+					if (result != null) {
+						utmArea.appendText(result.x + "," + result.y + "\n");
+					} else {
+						utmArea.appendText("no result\n");
+					}
 				}
 			}
 		} catch (Exception e) {
