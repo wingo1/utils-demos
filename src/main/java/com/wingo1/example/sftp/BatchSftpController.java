@@ -40,6 +40,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
@@ -52,7 +53,7 @@ public class BatchSftpController implements Initializable {
 	private File localDirectory;
 	private String remoteDirectory;
 	private final static String USER = "root";
-	private final static String PWD = "111111";
+	private static String PWD;
 	private static ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
 	@FXML
@@ -102,7 +103,6 @@ public class BatchSftpController implements Initializable {
 		});// 输出线程
 		thread.setDaemon(true);
 		thread.start();
-
 	}
 
 	@FXML
@@ -364,13 +364,31 @@ public class BatchSftpController implements Initializable {
 	private <T extends Channel> T getChannel(String ip, Class<T> channelType, boolean connect) throws JSchException {
 		JSch jsch = new JSch();
 		session = jsch.getSession(USER, ip);
+		if (PWD == null) {
+			// 确定服务器密码
+			TextInputDialog pwdInputDialog = new TextInputDialog("111111");
+			pwdInputDialog.setTitle("服务器密码");
+			pwdInputDialog.setHeaderText("输入服务器root的密码");
+			pwdInputDialog.setContentText("密码:");
+			PWD = pwdInputDialog.showAndWait().get();
+			System.out.println("服务器密码：" + PWD);
+		}
 		session.setPassword(PWD);
 		Properties configTemp = new Properties();
 		configTemp.put("StrictHostKeyChecking", "no");
 		// 为Session对象设置properties
 		session.setConfig(configTemp);
 		session.setTimeout(2000);
-		session.connect();
+		try {
+			session.connect();
+		} catch (JSchException e) {
+			if ("Auth fail".equals(e.getMessage())) {
+				System.out.println("密码错误！");
+				PWD = null;
+				throw e;
+			}
+		}
+
 		// 通过Session建立链接
 		// 打开SFTP通道
 		T channel = null;
