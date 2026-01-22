@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -59,6 +60,8 @@ public class BatchSftpController implements Initializable {
 	@FXML
 	private TextField ipTextField;
 	@FXML
+	private TextField portField;
+	@FXML
 	private TextField remoteDir;
 	@FXML
 	private ListView<String> localList;
@@ -94,7 +97,7 @@ public class BatchSftpController implements Initializable {
 						output.appendText(msg);
 				});
 				try {
-					TimeUnit.SECONDS.sleep(1);
+					TimeUnit.SECONDS.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -133,7 +136,7 @@ public class BatchSftpController implements Initializable {
 	@FXML
 	private void batchUploadClick() {
 		parseIpText(ipTextField.getText());
-		Alert alert = new Alert(AlertType.CONFIRMATION, "确定上传文件到以下主机:", ButtonType.YES, ButtonType.NO);
+		Alert alert = new Alert(AlertType.CONFIRMATION, "确定上传文件到以下主机？", ButtonType.YES, ButtonType.NO);
 		TextArea textArea = new TextArea(ipList.toString());
 		textArea.setWrapText(true);
 		alert.getDialogPane().setExpandableContent(textArea);
@@ -152,12 +155,6 @@ public class BatchSftpController implements Initializable {
 			});
 		}
 
-	}
-
-	@FXML
-	private void download() {
-		Alert alert = new Alert(AlertType.INFORMATION, "未实现", ButtonType.CANCEL);
-		alert.showAndWait();
 	}
 
 	/**
@@ -182,7 +179,7 @@ public class BatchSftpController implements Initializable {
 					}
 					try (InputStream inputStream = FileUtils.openInputStream(selectFile);) {
 						channelSftp.put(inputStream, select);
-						System.out.println(ip + "上传完成！");
+						System.out.println(ip + ":" + select + "上传完成！");
 					}
 					// 修改权限
 					channelSftp.chmod(Integer.parseInt("777", 8), select);
@@ -198,6 +195,70 @@ public class BatchSftpController implements Initializable {
 		} catch (Exception e) {
 			System.out.println("batchUpload refreshRemote出错" + e);
 		}
+	}
+
+	@FXML
+	private void batchDownloadClick() {
+		parseIpText(ipTextField.getText());
+		Alert alert = new Alert(AlertType.CONFIRMATION, "确定从以下主机下载文件？", ButtonType.YES, ButtonType.NO);
+		TextArea textArea = new TextArea(ipList.toString());
+		textArea.setWrapText(true);
+		alert.getDialogPane().setExpandableContent(textArea);
+		alert.getDialogPane().setExpanded(true);
+		Optional<ButtonType> showAndWait = alert.showAndWait();
+		if (showAndWait.get() == ButtonType.YES) {
+			if (remoteList.getSelectionModel().getSelectedItems().size() == 0) {
+				alert = new Alert(AlertType.ERROR);
+				alert.setContentText("未选择远程文件");
+				alert.showAndWait();
+				System.out.println("未选择远程文件");
+				return;
+			}
+			// 本地创建文件夹
+			DirectoryChooser directoryChooser = new DirectoryChooser();
+			directoryChooser.setTitle("选择本地保存的文件夹,最好新建一个文件夹");
+			directoryChooser.setInitialDirectory(new File("."));
+			File saveDir = directoryChooser.showDialog(null);
+			if (saveDir == null) {
+				new Alert(AlertType.ERROR, "选择本地保存的文件夹").showAndWait();
+				return;
+			}
+			threadPool.execute(() -> {
+				batchDownload(saveDir);
+			});
+		}
+	}
+
+	private void batchDownload(File saveDir) {
+		// 批量IP
+		for (String ip : ipList) {
+			ChannelSftp channelSftp = null;
+			try {
+				channelSftp = getChannel(ip, ChannelSftp.class);
+				channelSftp.cd(remoteDirectory);
+				// 本地创建文件夹
+				File fileDir = new File(saveDir.getAbsolutePath() + "/" + ip);
+				fileDir.mkdir();
+				// 批量文件
+				List<String> selectedValuesList = remoteList.getSelectionModel().getSelectedItems();
+				for (String select : selectedValuesList) {
+					InputStream inputStream = channelSftp.get(select);
+					FileUtils.copyInputStreamToFile(inputStream, new File(fileDir.getAbsolutePath() + "/" + select));
+					inputStream.close();
+					System.out.println(ip + ":" + select + "下载完成！");
+				}
+			} catch (Exception e) {
+				System.err.println(ip + "批量下载出错:" + e);
+			} finally {
+				logout(channelSftp);
+			}
+		}
+		try {
+			refreshRemote();
+		} catch (Exception e) {
+			System.out.println("batchDownload refreshRemote出错" + e);
+		}
+
 	}
 
 	@FXML
@@ -264,6 +325,7 @@ public class BatchSftpController implements Initializable {
 			}
 			localObservableList.add(item);
 		}
+		localObservableList.sort(Comparator.naturalOrder());
 	}
 
 	private void refreshRemote() throws Exception {
@@ -285,6 +347,7 @@ public class BatchSftpController implements Initializable {
 				}
 				remoteObservableList.add(entry.getFilename());
 			}
+			remoteObservableList.sort(Comparator.naturalOrder());
 			System.out.println("远端目录刷新完成！");
 			logout(channelSftp);
 		});
@@ -363,7 +426,7 @@ public class BatchSftpController implements Initializable {
 
 	private <T extends Channel> T getChannel(String ip, Class<T> channelType, boolean connect) throws JSchException {
 		JSch jsch = new JSch();
-		session = jsch.getSession(USER, ip);
+		session = jsch.getSession(USER, ip, Integer.valueOf(portField.getText()));
 		if (PWD == null) {
 			// 确定服务器密码
 			TextInputDialog pwdInputDialog = new TextInputDialog("111111");
