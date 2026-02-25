@@ -13,6 +13,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -33,6 +35,9 @@ public class HtmlEditorTest extends Application {
 		final HTMLEditor htmlEditor = new HTMLEditor();
 		htmlEditor.setPrefHeight(245);
 		Node toolbarNode = htmlEditor.lookup(".top-toolbar");
+		WebView webview = (WebView) htmlEditor.lookup("WebView");
+		GridPane.setHgrow(webview, Priority.ALWAYS);
+		GridPane.setVgrow(webview, Priority.ALWAYS);
 		if (toolbarNode instanceof ToolBar) {
 			ToolBar topToolBar = (ToolBar) toolbarNode;
 
