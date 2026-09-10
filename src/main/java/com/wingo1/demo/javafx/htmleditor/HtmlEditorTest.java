@@ -33,6 +33,7 @@ public class HtmlEditorTest extends Application {
 		final HTMLEditor htmlEditor = new HTMLEditor();
 		htmlEditor.setPrefHeight(245);
 		Node toolbarNode = htmlEditor.lookup(".top-toolbar");
+		System.out.println("tst4conflict");
 		if (toolbarNode instanceof ToolBar) {
 			ToolBar topToolBar = (ToolBar) toolbarNode;
 
