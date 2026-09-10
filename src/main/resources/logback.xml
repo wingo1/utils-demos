@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- To change this template, choose Tools | Templates and open the template 
+	in the editor. -->
+<configuration scan="true">
+	<!-- 这样就不用担心ImmediateFlush=false时，程序关闭日志不全的问题 -->
+	<shutdownHook class='ch.qos.logback.core.hook.DelayingShutdownHook'/>
+	 <appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>log/${HOSTNAME}_logbacktest_current.log</file> 
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<timeBasedFileNamingAndTriggeringPolicy class="com.wingo1.demo.MyTimeBasedFileNamingAndTriggeringPolicy"/>
+			<fileNamePattern>log/${HOSTNAME}_logbacktest_%d{yyyyMMdd_HHmm}00-[CDATC-ENDTIME].log
+			</fileNamePattern>
+			<maxHistory>720</maxHistory>
+			<totalSizeCap>100GB</totalSizeCap>
+		</rollingPolicy>
+		<ImmediateFlush>true</ImmediateFlush>
+		<encoder>
+			<pattern>%d %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_FILE"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE" />
+	</appender> 
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{0}) %msg%n</pattern>
+		</encoder>
+	</appender>
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ASYNC_FILE" />
+	</root>
+</configuration>  

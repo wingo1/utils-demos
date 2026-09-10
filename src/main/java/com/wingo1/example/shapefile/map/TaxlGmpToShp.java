@@ -53,7 +53,7 @@ public class TaxlGmpToShp {
 	private String CRS_STRING = "32648";
 
 	public void excute(String crsCode) throws Exception {
-		if (crsCode != null && "".equals(crsCode)) {
+		if (crsCode != null && !"".equals(crsCode)) {
 			CRS_STRING = crsCode;
 		}
 		File file = JFileDataStoreChooser.showOpenFile("gmp", new File("d:/"), null);
@@ -92,9 +92,13 @@ public class TaxlGmpToShp {
 			ExtinfoTaxiLine extinfo = extinfoMap.get(polyline.getName());
 			MultiLineString createMultiLineString = geometryFactory
 					.createMultiLineString(new LineString[] { createLineString });
-			featureBuilder.addAll(new Object[] { createMultiLineString, extinfo.getType(), extinfo.getTaxiname(),
-					extinfo.getTypename(), extinfo.getDirect(), extinfo.getWinglength(), extinfo.getPcn(),
-					extinfo.getMainwheel() });
+			if (extinfo != null) {
+				featureBuilder.addAll(new Object[] { createMultiLineString, extinfo.getType(), extinfo.getTaxiname(),
+						extinfo.getTypename(), extinfo.getDirect(), extinfo.getWinglength(), extinfo.getPcn(),
+						extinfo.getMainwheel() });
+			} else {
+				featureBuilder.addAll(new Object[] { createMultiLineString, "normal", "", "", "Both", 0, 0, 0 });
+			}
 			SimpleFeature feature = featureBuilder.buildFeature(null);
 			features.add(feature);
 
